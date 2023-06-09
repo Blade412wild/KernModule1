@@ -67,19 +67,21 @@ float PhysicsObject::CalculateFrictionCoeffient(float _fMotor, float _normalForc
 float PhysicsObject::CalculateFmotor(){
 	float _ForceAcceleration = 100000.0f;
 	float _ForceDecceleration = 200000.0f;
+	float _MaxForce = 50000000.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-		if (currentForce < 700000) {
+		if (NewForce < _MaxForce) {
 			NewForce = currentForce + _ForceAcceleration;
 			currentForce = NewForce;
 		}
 	}
 
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-		if (currentForce < 7000000) {
+		if (NewForce < _MaxForce) {
 			NewForce = currentForce + _ForceAcceleration;
 			currentForce = NewForce;
 		}
+
 	}
 
 	else {

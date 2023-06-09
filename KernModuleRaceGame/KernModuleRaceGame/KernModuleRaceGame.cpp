@@ -18,6 +18,10 @@ sf::RectangleShape Background(sf::Vector2f(WidowWidth, WindowHeight));
 sf::Keyboard::Key MenuButton;
 
 //PlayerStats
+float PlayerWidth = 100.0f;
+float PlayerHeight = PlayerWidth;
+float PlayerCollissionRadius = PlayerWidth / 2;
+sf::CircleShape PlayerCollission(PlayerCollissionRadius);
 sf::RectangleShape Player(sf::Vector2f(100.0f, 100.0f));
 sf::RectangleShape ScoreHud(sf::Vector2f(200.0f, 150.0f));
 
@@ -69,12 +73,6 @@ void setup() {
     ScoreHud.setPosition(hudPosX, hudPosY);
     Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
-    // Physics
-    //playerVelocity = PhysicsPlayer.CalculateVelocity(74.0f);
-    playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f);
-    PhysicsPlayer.ShowInformation();
-
-
     //Score
     if (!font.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Playkiddo.ttf"))
     {
@@ -93,14 +91,19 @@ void setup() {
 void playerMovement() {
     playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f);
 
+    if (PlayerCurrentPosX > WidowWidth - 100.0f) {
+        PlayerCurrentPosX = WidowWidth - 100.0f;
+    }
+    if (PlayerCurrentPosX < 0) {
+        PlayerCurrentPosX = 0;
+    }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && PlayerCurrentPosX > 0) {
         GoingRight = false;
         PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
         PlayerCurrentPosX = PlayerNewPosX;
-        Player.setPosition(PlayerNewPosX, PlayerCurrentPosY);
+        Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
    
-        MotorForce = PhysicsPlayer.CalculateFmotor();
-        std::cout << MotorForce << std::endl;
 
 
     }
@@ -108,30 +111,32 @@ void playerMovement() {
         GoingRight = true;
         PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
         PlayerCurrentPosX = PlayerNewPosX;
-        Player.setPosition(PlayerNewPosX, PlayerCurrentPosY);
+        Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
-        MotorForce = PhysicsPlayer.CalculateFmotor();
-        std::cout << MotorForce << std::endl;
     }
     else {
-        if (GoingRight == true) {
+        if (GoingRight == true && PlayerCurrentPosX > 0) {
             PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
             PlayerCurrentPosX = PlayerNewPosX;
-            Player.setPosition(PlayerNewPosX, PlayerCurrentPosY);
+            Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
         }
-        else {
+
+        if(GoingRight == false && PlayerCurrentPosX < WidowWidth - 100.0f) {
             PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
             PlayerCurrentPosX = PlayerNewPosX;
-            Player.setPosition(PlayerNewPosX, PlayerCurrentPosY);
+            Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
         }
-        MotorForce = PhysicsPlayer.CalculateFmotor();
-        std::cout << MotorForce << std::endl;
+
     }
 
+    
+
+    std::cout << "PlayerCurrentPosX : " << PlayerCurrentPosX << std::endl;
 
 
 
 }
+
 int main()
 {
 
