@@ -70,7 +70,5 @@ public:
 	float CalculatingDisplacement(float _mass);
 	float CalculateFmotor();
 	void ShowInformation();
-
-
 };
 

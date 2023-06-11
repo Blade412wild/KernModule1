@@ -4,26 +4,39 @@
 #include <iostream> 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Rect.hpp>
-#include "PhysicsObject.h"
+#include <vector>
 #include <string>
+#include "PhysicsObject.h"
+#include "KernModuleRaceGame.h"
+#include "Vector2.h"
+#include "Enemy.h"
 
 
 
-    //windowStats
+//windowStats
 int WidowWidth = 1920;
 int WindowHeight = 1080;
 
+
 sf::RectangleShape Background(sf::Vector2f(WidowWidth, WindowHeight));
+sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
+
 
 sf::Keyboard::Key MenuButton;
 
-//PlayerStats
+//looks
+float PlayerHeight = 100.0f;
 float PlayerWidth = 100.0f;
-float PlayerHeight = PlayerWidth;
+
+//PlayerStats
 float PlayerCollissionRadius = PlayerWidth / 2;
-sf::CircleShape PlayerCollission(PlayerCollissionRadius);
-sf::RectangleShape Player(sf::Vector2f(100.0f, 100.0f));
+sf::CircleShape PlayerCollission(PlayerCollissionRadius, 30.0f);
+sf::RectangleShape Player(sf::Vector2f(PlayerWidth, PlayerHeight));
 sf::RectangleShape ScoreHud(sf::Vector2f(200.0f, 150.0f));
+
+sf::CircleShape enemyCollission(PlayerCollissionRadius, 30.0f);
+sf::RectangleShape enemyTest(sf::Vector2f(100.0f, 100.0f));
+
 
 //Positie
 float PlayerBeginPosX = 960;
@@ -37,9 +50,6 @@ float PlayerNewPosY;
 
 float speed = 0.1;
 
-//looks
-float Playerheight = 100.0f;
-float PlayerWidth = 100.0f;
 
 // score
 float hudPosX = WidowWidth - 200.0f;
@@ -59,127 +69,208 @@ PhysicsObject PhysicsPlayer;
 //input
 bool GoingRight;
 
+//collission
+float PlayerCollissionPosX;
+float PlayerCollissionPosY;
 
+// Vector2
+//Vector2 vector2;
+Vector2* PuntA = new Vector2(2.0f, 5.0f);;
+Vector2* PuntB = new Vector2(4.0f, 3.0f);;
+
+// Enemies
+std::vector<Enemy*> lijstMetEnemies;
+std::vector<int> lijstMetEnemiesGemist;
+int EnemyAddCounter;
+bool laagGenoeg;
 
 
 void setup() {
-    MenuButton = sf::Keyboard::Key::Escape;
-    PlayerCurrentPosX = PlayerBeginPosX;
-    PlayerCurrentPosY = WindowHeight - Playerheight;
-    Background.setFillColor(sf::Color(0, 0, 0));
-    Player.setFillColor(sf::Color(255, 255, 255));
-    ScoreHud.setFillColor(sf::Color(255, 0, 0));
+	MenuButton = sf::Keyboard::Key::Escape;
+	PlayerCurrentPosX = PlayerBeginPosX;
+	PlayerCurrentPosY = WindowHeight - PlayerHeight;
 
-    ScoreHud.setPosition(hudPosX, hudPosY);
-    Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
+	PlayerCollission.setFillColor(sf::Color(0, 255, 255));
 
-    //Score
-    if (!font.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Playkiddo.ttf"))
-    {
-        std::cout << "error!\n";
-    }
+	Background.setFillColor(sf::Color(0, 0, 0));
+	Player.setFillColor(sf::Color(255, 255, 255));
+	ScoreHud.setFillColor(sf::Color(255, 0, 0));
 
-    score = std::to_string(test);
-    text.setFont(font);
-    text.setString(std::to_string(test));
-    text.setCharacterSize(24);
-    text.setFillColor(sf::Color::Yellow);
-    text.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
+	ScoreHud.setPosition(hudPosX, hudPosY);
+	Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
+
+	enemyCollission.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
+	enemyCollission.setFillColor(sf::Color(255, 0, 255));
+	enemyTest.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
+	enemyTest.setFillColor(sf::Color(255, 255, 255));
+
+
+	//Score
+	if (!font.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Playkiddo.ttf"))
+	{
+		std::cout << "error!\n";
+	}
+
+	//score = std::to_string(test);
+
+	text.setFont(font);
+	text.setString(std::to_string(test));
+	text.setCharacterSize(24);
+	text.setFillColor(sf::Color::Yellow);
+	text.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
+}
+
+void EnemySetup() {
+
+	//Enemies
+	//lijstMetEnemies = new std::vector<Enemy>();
+	//lijstMetEnemiesGemist = new std::vector<int>();
+
+	// Monster Pointers toevoegen aan de de ArrayList lijstMetEnemys
+	for (int i = 0; i <= 2; i = i + 1) {
+		lijstMetEnemies.push_back(new Enemy(i));
+
+		for (auto i = lijstMetEnemiesGemist.begin(); i != lijstMetEnemiesGemist.end(); ++i)
+			std::cout << *i << " ";
+	}
+
+}
+
+void EnemyUpdating() {
+	EnemyAddCounter = EnemyAddCounter + 1;
+
+	if (lijstMetEnemies.size() >= 80) {
+		lijstMetEnemies.push_back(new Enemy(1));
+		EnemyAddCounter = 0;
+	}
+}
+
+void Vector2Testing() {
+	//float _distance = vector2.Distance(PuntA, PuntB);
+	//float _distance = Vector2.Distance(PuntA, PuntB);
+	//float _distance = Vector2::Distance(PuntA, PuntB);
+
+
+	//float _test = vector2.Test(3.0f, 5.0f);
 
 }
 
 void playerMovement() {
-    playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f);
+	playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f);
 
-    if (PlayerCurrentPosX > WidowWidth - 100.0f) {
-        PlayerCurrentPosX = WidowWidth - 100.0f;
-    }
-    if (PlayerCurrentPosX < 0) {
-        PlayerCurrentPosX = 0;
-    }
+	if (PlayerCurrentPosX > WidowWidth - 100.0f) {
+		PlayerCurrentPosX = WidowWidth - 100.0f;
+	}
+	if (PlayerCurrentPosX < 0) {
+		PlayerCurrentPosX = 0;
+	}
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && PlayerCurrentPosX > 0) {
-        GoingRight = false;
-        PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
-        PlayerCurrentPosX = PlayerNewPosX;
-        Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
-   
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && PlayerCurrentPosX > 0) {
+		GoingRight = false;
+		PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
+		PlayerCurrentPosX = PlayerNewPosX;
+		Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && PlayerCurrentPosX < WidowWidth - 100.0f) {
+		GoingRight = true;
+		PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
+		PlayerCurrentPosX = PlayerNewPosX;
+		Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
-    }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && PlayerCurrentPosX < WidowWidth - 100.0f) {
-        GoingRight = true;
-        PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
-        PlayerCurrentPosX = PlayerNewPosX;
-        Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
+	}
+	else {
+		if (GoingRight == true && PlayerCurrentPosX > 0) {
+			PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
+			PlayerCurrentPosX = PlayerNewPosX;
+			Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
+		}
 
-    }
-    else {
-        if (GoingRight == true && PlayerCurrentPosX > 0) {
-            PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
-            PlayerCurrentPosX = PlayerNewPosX;
-            Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
-        }
+		if (GoingRight == false && PlayerCurrentPosX < WidowWidth - 100.0f) {
+			PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
+			PlayerCurrentPosX = PlayerNewPosX;
+			Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
+		}
 
-        if(GoingRight == false && PlayerCurrentPosX < WidowWidth - 100.0f) {
-            PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
-            PlayerCurrentPosX = PlayerNewPosX;
-            Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
-        }
+	}
 
-    }
+	//std::cout << "PlayerCurrentPosX : " << PlayerCurrentPosX << std::endl;
+}
 
-    
+void CollissionCheck() {
+	PlayerCollissionPosX = PlayerCurrentPosX /*- PlayerWidth*/;
+	PlayerCollissionPosY = PlayerCurrentPosY /*+ PlayerHeight*/;
+	PlayerCollission.setPosition(PlayerCollissionPosX, PlayerCollissionPosY);
 
-    std::cout << "PlayerCurrentPosX : " << PlayerCurrentPosX << std::endl;
+	//std::cout << "PlayerCollissionPosX : " << PlayerCollissionPosX << std::endl;
 
+}
 
+void EnemyManagment() {
+	for (int i = 0; i < lijstMetEnemies.size(); i = i + 1) {
+		lijstMetEnemies[i];
+		// hier wordt de functie die de peguinMonster laat bewegen opgevraaggd
+		//huidigeEnemy.PeguinMonsterBeweger();
+		laagGenoeg = lijstMetEnemies[i]->BenIkLaagGenoeg(PlayerCollissionPosY);
+		//lijstMetEnemies[i]->DrawEnemy(window);
 
+		window.draw(enemyTest);
+		window.draw(enemyCollission);
+
+		if (laagGenoeg) {
+			lijstMetEnemies[i]->IsThereCollission(PlayerCollissionPosX, PlayerCollissionPosY);
+		}
+
+	}
 }
 
 int main()
 {
 
-    sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
-    sf::Event e;
+	//sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
+	sf::Event e;
+	window.setFramerateLimit(60);
+		window.draw(Background);
 
-    window.setFramerateLimit(60);
+	setup();
+	EnemySetup();
+	//Vector2Testing();
 
-    setup();
+	while (window.isOpen())
+	{
 
-    while (window.isOpen())
-    {
+		while (window.pollEvent(e))
+		{
+			if (e.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
 
-        while (window.pollEvent(e))
-        {
-            if (e.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
+		playerMovement();
+		CollissionCheck();
+		EnemyManagment();
 
-        sf::Texture texure;
-
-
-        playerMovement();
-
-        if (sf::Keyboard::isKeyPressed(MenuButton)) {
-            window.close();
-        }
+		if (sf::Keyboard::isKeyPressed(MenuButton)) {
+			window.close();
+		}
 
 
-        test = test + 1;
-        text.setString(std::to_string(test));
 
-        window.clear();
-        window.draw(Background);
-        window.draw(ScoreHud);
-        window.draw(text);
-        window.draw(Player);
-        window.display();
-    }
-    std::cout << "Hello World!\n";
-    std::cout << test;
+
+		test = test + 1;
+		text.setString(std::to_string(test));
+		window.draw(ScoreHud);
+		window.draw(text);
+		//window.draw(enemyTest);
+		//window.draw(enemyCollission);
+
+		window.draw(Player);
+		window.draw(PlayerCollission);
+		window.display();
+		window.clear();
+	}
+	//std::cout << test;
 }
 
 // wat heb ik nodig?
