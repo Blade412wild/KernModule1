@@ -6,8 +6,15 @@
 //	
 //}
 
-float PhysicsObject::CalculatingDisplacement(float _mass) {
-	Fmotor = PhysicsObject::CalculateFmotor();
+float PhysicsObject::CalculatingDisplacement(float _mass, int _identifier) {
+
+	if (_identifier == 1) {
+		Fmotor = PhysicsObject::CalculateFmotorPlayer();
+	}
+	else {
+		Fmotor = PhysicsObject::CalculateFmotorEnemy();
+	}
+
 	NormalForce = PhysicsObject::CalculateNormalForce(_mass);
 	FrictionCoeffient = PhysicsObject::CalculateFrictionCoeffient(Fmotor, NormalForce);
 	Friction = PhysicsObject::CalculateFriction(FrictionCoeffient, NormalForce);
@@ -32,7 +39,7 @@ float PhysicsObject::CalculateAcceleration(float _NettoForce, float _mass) {
 	return _acceleration;
 }
 
-float PhysicsObject::CalculateNettoForce(float _fMotor, float _friction ) {
+float PhysicsObject::CalculateNettoForce(float _fMotor, float _friction) {
 	float _fNetto;
 	_fNetto = _fMotor - _friction;
 	return _fNetto;
@@ -62,9 +69,9 @@ float PhysicsObject::CalculateFrictionCoeffient(float _fMotor, float _normalForc
 	}
 	return _FrictionCoeffient;
 }
- 
 
-float PhysicsObject::CalculateFmotor(){
+
+float PhysicsObject::CalculateFmotorPlayer() {
 	float _ForceAcceleration = 100000.0f;
 	float _ForceDecceleration = 200000.0f;
 	float _MaxForce = 50000000.0f;
@@ -93,9 +100,22 @@ float PhysicsObject::CalculateFmotor(){
 
 	}
 
+
 	//std::cout << "NewForce : " << NewForce << std::endl;
 	//std::cout << "currentForce : " << currentForce << std::endl;
 
+
+	return NewForce;
+}
+
+float PhysicsObject::CalculateFmotorEnemy() {
+	float _maxForce = 50000000.0f;
+	float  _ForceAcceleration = 100000.0f;
+
+	if (NewForce < _maxForce) {
+		NewForce = currentForce + _ForceAcceleration;
+		currentForce = NewForce;
+	}
 
 	return NewForce;
 }

@@ -139,7 +139,7 @@ void EnemySetup() {
 void EnemyUpdating() {
 	EnemyAddCounter = EnemyAddCounter + 1;
 
-	if (lijstMetEnemies.size() >= 80) {
+	if (EnemyAddCounter >= 80) {
 		lijstMetEnemies.push_back(new Enemy(1));
 		EnemyAddCounter = 0;
 	}
@@ -156,7 +156,7 @@ void Vector2Testing() {
 }
 
 void playerMovement() {
-	playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f);
+	playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f, 1);
 
 	if (PlayerCurrentPosX > WidowWidth - 100.0f) {
 		PlayerCurrentPosX = WidowWidth - 100.0f;
@@ -198,24 +198,26 @@ void playerMovement() {
 }
 
 void CollissionCheck() {
-	PlayerCollissionPosX = PlayerCurrentPosX /*- PlayerWidth*/;
-	PlayerCollissionPosY = PlayerCurrentPosY /*+ PlayerHeight*/;
+	PlayerCollissionPosX = PlayerCurrentPosX;
+	PlayerCollissionPosY = PlayerCurrentPosY;
 	PlayerCollission.setPosition(PlayerCollissionPosX, PlayerCollissionPosY);
 
 	//std::cout << "PlayerCollissionPosX : " << PlayerCollissionPosX << std::endl;
 
 }
 
+
+
 void EnemyManagment() {
 	for (int i = 0; i < lijstMetEnemies.size(); i = i + 1) {
-		lijstMetEnemies[i];
+		//lijstMetEnemies[i];
 		// hier wordt de functie die de peguinMonster laat bewegen opgevraaggd
-		//huidigeEnemy.PeguinMonsterBeweger();
+		lijstMetEnemies[i]->MoveEnemy();
+		std::cout << "ID : " << i << std::endl;
 		laagGenoeg = lijstMetEnemies[i]->BenIkLaagGenoeg(PlayerCollissionPosY);
-		//lijstMetEnemies[i]->DrawEnemy(window);
-
-		window.draw(enemyTest);
-		window.draw(enemyCollission);
+		window.draw(lijstMetEnemies[i]->getEnemyRect());
+		window.draw(lijstMetEnemies[i]->getEnemyCirlce());
+		//window.draw(enemyCollission);
 
 		if (laagGenoeg) {
 			lijstMetEnemies[i]->IsThereCollission(PlayerCollissionPosX, PlayerCollissionPosY);
@@ -246,7 +248,7 @@ int main()
 				window.close();
 			}
 		}
-
+		EnemyUpdating();
 		playerMovement();
 		CollissionCheck();
 		EnemyManagment();

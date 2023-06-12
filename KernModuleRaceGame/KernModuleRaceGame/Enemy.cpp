@@ -1,14 +1,29 @@
-#include "Enemy.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstdlib>
+#include "Enemy.h"
+#include "PhysicsObject.h"
+
+
 
 //constructor
-Enemy::Enemy(int _enemyID) {
+Enemy::Enemy(int _enemyID) 
+{
 
 	enemyID = _enemyID;
-	std::cout << "Enemy : " << enemyID << " Added to the list" <<  std::endl;
+	std::cout << "Enemy : " << enemyID << " Added to the list" << std::endl;
 
+	enemyRect = sf::RectangleShape(sf::Vector2f(EnemyWidth, EnemyHeight));
+	enemyCircle = sf::CircleShape(EnemyCollissionRadius, 30.0f);
+
+	beginPosX = std::rand() % 1920;
+
+	currentPosX = beginPosX;
+	goingRight = BeginMoveDirectionDecider();
+
+
+
+	//beginPosY = +-300 + std::rand() % 200;
 }
 
 //CopyConstructor
@@ -39,6 +54,57 @@ Enemy::~Enemy() {
 	std::cout << "destructor called for this vector  @ this memory location " << this << std::endl;
 }
 
+void Enemy::MoveEnemy() {
+	PlayTimeMoveDirectionDecider();
+	DrawEnemy();
+	currentPosX = NewPosCalulationX(currentPosX);
+	currentPosY = NewPosCalulationY(currentPosY);
+	//Enemy::MoveDirectionDecider(currentPosX);
+
+	std::cout << "CurrentPosY : " << currentPosY << " & CurrentPosX : " << currentPosX << std::endl;
+}
+
+float Enemy::NewPosCalulationY(float _currentpos) {
+
+	float _newPos;
+	_newPos = _currentpos + physicsObject.CalculatingDisplacement(1200.0f, 0);
+	return _newPos;
+}
+
+float Enemy::NewPosCalulationX(float _currentpos) {
+	float _newPos;
+	if (goingRight == true) {
+		_newPos = _currentpos + physicsObject.CalculatingDisplacement(1200.0f, 0);
+	}
+	else {
+		_newPos = _currentpos - physicsObject.CalculatingDisplacement(1200.0f, 0);
+
+	}
+	return _newPos;
+}
+
+void Enemy::PlayTimeMoveDirectionDecider() {
+	if (currentPosX <= 0) {
+		goingRight = true;
+	}
+	else if (currentPosX >= 1920 - EnemyWidth) {
+		goingRight = false;
+	}
+}
+
+bool Enemy::BeginMoveDirectionDecider() {
+	int _randomDecider = std::rand() % 2;
+
+	if (_randomDecider == 1) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
+
 bool Enemy::BenIkLaagGenoeg(float _playerPosY) {
 
 	if (currentPosY >= (_playerPosY - 100.0f)) {
@@ -49,8 +115,6 @@ bool Enemy::BenIkLaagGenoeg(float _playerPosY) {
 		return true;
 	}
 }
-
-
 
 bool Enemy::IsThereCollission(float PlayerPosX, float PlayerPosY) {
 	float C1r = 50.0f;
@@ -81,14 +145,22 @@ bool Enemy::IsThereCollission(float PlayerPosX, float PlayerPosY) {
 	return false;
 }
 
-void Enemy::DrawEnemy(sf::RenderWindow* window){
+void Enemy::DrawEnemy() {
+	enemyRect.setPosition(currentPosX, currentPosY);
+	//enemyRect.setSize(sf::Vector2f(100, 100));
+	////enemyRect.setScale(sf::Vector2f(10, 10));
+	enemyRect.setFillColor(sf::Color(255, 255, 255));
+	enemyCircle.setPosition(currentPosX, currentPosY);
+	enemyCircle.setFillColor(sf::Color(255, 0, 255));
 
-	sf::CircleShape EnemyCollission(EnemyCollissionRadius, 30.0f);
-	sf::RectangleShape Enemy(sf::Vector2f(EnemyWidth, EnemyHeight));
+}
 
-	window->draw(Enemy);
-	window->draw(EnemyCollission);
+sf::RectangleShape Enemy::getEnemyRect() {
+	return enemyRect;
+}
 
+sf::CircleShape Enemy::getEnemyCirlce() {
+	return enemyCircle;
 
 }
 

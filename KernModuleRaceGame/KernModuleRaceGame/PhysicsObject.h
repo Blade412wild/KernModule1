@@ -67,8 +67,9 @@ public:
 	float CalculateFriction(float _frictionCoeffient, float _normalForce);
 	float CalculateNormalForce(float _mass);
 	float CalculateFrictionCoeffient(float _fMotor, float _normalForce);
-	float CalculatingDisplacement(float _mass);
-	float CalculateFmotor();
+	float CalculatingDisplacement(float _mass, int _identifier);
+	float CalculateFmotorPlayer();
+	float CalculateFmotorEnemy();
 	void ShowInformation();
 };
 
