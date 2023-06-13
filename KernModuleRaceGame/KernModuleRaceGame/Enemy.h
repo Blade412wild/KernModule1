@@ -22,9 +22,9 @@ public:
 	~Enemy();
 
 	// checkt of de enemie al laag genoeg is voor Collission detection;
-	bool BenIkLaagGenoeg(float _playerPosY);
+	bool CollissionDetection(float _playerPosX, float _playerPosY);
 
-	bool IsThereCollission(float PlayerPosX, float PlayerPosY);
+	bool InCollissionArea(float PlayerPosY);
 
 	void DrawEnemy();
 
@@ -37,6 +37,10 @@ public:
 	bool BeginMoveDirectionDecider();
 
 	void PlayTimeMoveDirectionDecider();
+
+	float InBetweenDistance(float PlayerPosX, float PlayerPosY);
+
+	bool behondCollissionArea(float _playerPosY);
 
 	sf::RectangleShape getEnemyRect();
 	sf::CircleShape getEnemyCirlce();

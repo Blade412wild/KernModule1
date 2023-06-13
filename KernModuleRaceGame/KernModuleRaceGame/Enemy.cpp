@@ -32,6 +32,7 @@ Enemy::Enemy(const Enemy& source) {
 
 	enemyID = source.enemyID;
 
+	goingRight = BeginMoveDirectionDecider();
 }
 
 //overloaded Assignment operator
@@ -59,7 +60,6 @@ void Enemy::MoveEnemy() {
 	DrawEnemy();
 	currentPosX = NewPosCalulationX(currentPosX);
 	currentPosY = NewPosCalulationY(currentPosY);
-	//Enemy::MoveDirectionDecider(currentPosX);
 
 	std::cout << "CurrentPosY : " << currentPosY << " & CurrentPosX : " << currentPosX << std::endl;
 }
@@ -105,18 +105,40 @@ bool Enemy::BeginMoveDirectionDecider() {
 
 
 
-bool Enemy::BenIkLaagGenoeg(float _playerPosY) {
+bool Enemy::CollissionDetection(float _playerPosX, float _playerPosY) {
 
-	if (currentPosY >= (_playerPosY - 100.0f)) {
+	float _inBetweenDistance = InBetweenDistance(_playerPosX, _playerPosY);
+	if (_inBetweenDistance <= 0) {
 		return true;
 	}
 	else {
+		return false;
+	}
 
+}
+
+bool Enemy::InCollissionArea(float PlayerPosY) {
+	bool isAlive = true;
+
+	if (currentPosY < PlayerPosY - 100.0f || currentPosY > PlayerPosY + 100.0f) {
+		return false;
+	}
+
+	else {
 		return true;
 	}
 }
 
-bool Enemy::IsThereCollission(float PlayerPosX, float PlayerPosY) {
+bool Enemy::behondCollissionArea(float _playerPosY) {
+	if (currentPosY > _playerPosY + 100.0f) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+float Enemy::InBetweenDistance(float PlayerPosX, float PlayerPosY) {
 	float C1r = 50.0f;
 	float C2r = 50.0f;
 
@@ -129,20 +151,7 @@ bool Enemy::IsThereCollission(float PlayerPosX, float PlayerPosY) {
 	float _distance = _sqrtDistance1 - ((C1r + C2r) * (C1r + C2r));
 	float _inBetweenDistance = _distance - ((C1r + C2r) * (C1r + C2r));
 
-	//std::cout << "_distance 1 : " << _distance << std::endl;
-	//std::cout << "_inBetweenDistance 1 : " << _inBetweenDistance << std::endl;
-
-	if (_inBetweenDistance < 0) {
-		return true;
-	}
-	else if (_inBetweenDistance > 0) {
-		return false;
-	}
-	else {
-		return true;
-	}
-
-	return false;
+	return _inBetweenDistance;
 }
 
 void Enemy::DrawEnemy() {

@@ -55,10 +55,10 @@ float speed = 0.1;
 float hudPosX = WidowWidth - 200.0f;
 float hudPosY = 0.0f;
 sf::Font font;
-sf::Text text;
+sf::Text showPoints;
 std::string score;
 
-int test = 1;
+int points = 0;
 
 // Physics
 float MotorForce;
@@ -82,7 +82,9 @@ Vector2* PuntB = new Vector2(4.0f, 3.0f);;
 std::vector<Enemy*> lijstMetEnemies;
 std::vector<int> lijstMetEnemiesGemist;
 int EnemyAddCounter;
-bool laagGenoeg;
+bool inCollissionArea;
+bool Collission;
+bool behondCollissionArea;
 
 
 void setup() {
@@ -99,10 +101,10 @@ void setup() {
 	ScoreHud.setPosition(hudPosX, hudPosY);
 	Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
-	enemyCollission.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
+	enemyCollission.setPosition(0.0f, 0.0f);
 	enemyCollission.setFillColor(sf::Color(255, 0, 255));
-	enemyTest.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
-	enemyTest.setFillColor(sf::Color(255, 255, 255));
+	//enemyTest.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
+	//enemyTest.setFillColor(sf::Color(255, 255, 255));
 
 
 	//Score
@@ -113,11 +115,11 @@ void setup() {
 
 	//score = std::to_string(test);
 
-	text.setFont(font);
-	text.setString(std::to_string(test));
-	text.setCharacterSize(24);
-	text.setFillColor(sf::Color::Yellow);
-	text.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
+	showPoints.setFont(font);
+	showPoints.setString(std::to_string(points));
+	showPoints.setCharacterSize(24);
+	showPoints.setFillColor(sf::Color::Yellow);
+	showPoints.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
 }
 
 void EnemySetup() {
@@ -139,7 +141,7 @@ void EnemySetup() {
 void EnemyUpdating() {
 	EnemyAddCounter = EnemyAddCounter + 1;
 
-	if (EnemyAddCounter >= 80) {
+	if (EnemyAddCounter >= 40) {
 		lijstMetEnemies.push_back(new Enemy(1));
 		EnemyAddCounter = 0;
 	}
@@ -211,17 +213,36 @@ void CollissionCheck() {
 void EnemyManagment() {
 	for (int i = 0; i < lijstMetEnemies.size(); i = i + 1) {
 		//lijstMetEnemies[i];
-		// hier wordt de functie die de peguinMonster laat bewegen opgevraaggd
+
+		// hier wordt de enemy zijn behavoir opgeroepen;
 		lijstMetEnemies[i]->MoveEnemy();
-		std::cout << "ID : " << i << std::endl;
-		laagGenoeg = lijstMetEnemies[i]->BenIkLaagGenoeg(PlayerCollissionPosY);
+
+		//hier wordt om het lichaam van de enemy gevraagd om hem te tekenen op de window
 		window.draw(lijstMetEnemies[i]->getEnemyRect());
 		window.draw(lijstMetEnemies[i]->getEnemyCirlce());
-		//window.draw(enemyCollission);
 
-		if (laagGenoeg) {
-			lijstMetEnemies[i]->IsThereCollission(PlayerCollissionPosX, PlayerCollissionPosY);
+		//collission detection
+		inCollissionArea = lijstMetEnemies[i]->InCollissionArea(PlayerCollissionPosY);
+		behondCollissionArea = lijstMetEnemies[i]->behondCollissionArea(PlayerCollissionPosY);
+
+		if (inCollissionArea == true) {
+			Collission = lijstMetEnemies[i]->CollissionDetection(PlayerCollissionPosX, PlayerCollissionPosY);
+			if (Collission == true) {
+				// game over screen
+				std::cout << "Game over" << std::endl;
+			}
 		}
+
+		if (behondCollissionArea == true) {
+			// + 1 score en delete enemy
+			points++;
+			//delete lijstMetEnemies[i];
+		}
+
+
+		//if (laagGenoeg) {
+		//	lijstMetEnemies[i]->IsAlive(PlayerCollissionPosX, PlayerCollissionPosY);
+		//}
 
 	}
 }
@@ -260,12 +281,12 @@ int main()
 
 
 
-		test = test + 1;
-		text.setString(std::to_string(test));
+		//test = test + 1;
+		showPoints.setString(std::to_string(points));
 		window.draw(ScoreHud);
-		window.draw(text);
+		window.draw(showPoints);
 		//window.draw(enemyTest);
-		//window.draw(enemyCollission);
+		window.draw(enemyCollission);
 
 		window.draw(Player);
 		window.draw(PlayerCollission);
