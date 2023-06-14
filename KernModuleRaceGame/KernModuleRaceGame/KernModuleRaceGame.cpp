@@ -37,6 +37,8 @@ sf::RectangleShape ScoreHud(sf::Vector2f(200.0f, 150.0f));
 sf::CircleShape enemyCollission(PlayerCollissionRadius, 30.0f);
 sf::RectangleShape enemyTest(sf::Vector2f(100.0f, 100.0f));
 
+bool playerIsAlive;
+
 
 //Positie
 float PlayerBeginPosX = 960;
@@ -49,6 +51,11 @@ float PlayerNewPosX;
 float PlayerNewPosY;
 
 float speed = 0.1;
+
+//endscreens
+sf::Texture gameoverTexture;
+sf::Sprite gameoverSprite;
+
 
 
 // score
@@ -91,6 +98,7 @@ void setup() {
 	MenuButton = sf::Keyboard::Key::Escape;
 	PlayerCurrentPosX = PlayerBeginPosX;
 	PlayerCurrentPosY = WindowHeight - PlayerHeight;
+	playerIsAlive = true;
 
 	PlayerCollission.setFillColor(sf::Color(0, 255, 255));
 
@@ -120,6 +128,17 @@ void setup() {
 	showPoints.setCharacterSize(24);
 	showPoints.setFillColor(sf::Color::Yellow);
 	showPoints.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
+
+
+	//end screens 
+	if (!gameoverTexture.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Gameover1.PNG"))
+	{
+		// error...
+	}
+	gameoverSprite.setPosition(0.0f, 15.0f);
+	gameoverSprite.setTexture(gameoverTexture);
+	gameoverSprite.scale(sf::Vector2f(2.0f, 2.0f));
+
 }
 
 void EnemySetup() {
@@ -208,8 +227,6 @@ void CollissionCheck() {
 
 }
 
-
-
 void EnemyManagment() {
 	for (int i = 0; i < lijstMetEnemies.size(); i = i + 1) {
 		//lijstMetEnemies[i];
@@ -229,14 +246,18 @@ void EnemyManagment() {
 			Collission = lijstMetEnemies[i]->CollissionDetection(PlayerCollissionPosX, PlayerCollissionPosY);
 			if (Collission == true) {
 				// game over screen
+				playerIsAlive = false;
 				std::cout << "Game over" << std::endl;
 			}
 		}
 
 		if (behondCollissionArea == true) {
 			// + 1 score en delete enemy
-			points++;
+			//lijstMetEnemies.erase(lijstMetEnemies[i]);
 			//delete lijstMetEnemies[i];
+			//lijstMetEnemies.erase(lijstMetEnemies.begin());
+			
+			points++;
 		}
 
 
@@ -253,7 +274,7 @@ int main()
 	//sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
 	sf::Event e;
 	window.setFramerateLimit(60);
-		window.draw(Background);
+	window.draw(Background);
 
 	setup();
 	EnemySetup();
@@ -279,17 +300,21 @@ int main()
 		}
 
 
+		if (playerIsAlive == true) {
+			//test = test + 1;
+			showPoints.setString(std::to_string(points));
+			window.draw(ScoreHud);
+			window.draw(showPoints);
+			//window.draw(enemyTest);
+			window.draw(enemyCollission);
+			window.draw(Player);
+			window.draw(PlayerCollission);
+		}
+		else {
+			window.draw(Background);
+			window.draw(gameoverSprite);
+		}
 
-
-		//test = test + 1;
-		showPoints.setString(std::to_string(points));
-		window.draw(ScoreHud);
-		window.draw(showPoints);
-		//window.draw(enemyTest);
-		window.draw(enemyCollission);
-
-		window.draw(Player);
-		window.draw(PlayerCollission);
 		window.display();
 		window.clear();
 	}
