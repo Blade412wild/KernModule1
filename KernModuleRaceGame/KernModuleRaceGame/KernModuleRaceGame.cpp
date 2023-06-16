@@ -14,28 +14,26 @@
 
 
 //windowStats
-int WidowWidth = 1920;
-int WindowHeight = 1080;
+int windowWidth = 1920;
+int windowHeight = 1080;
 
 
-sf::RectangleShape Background(sf::Vector2f(WidowWidth, WindowHeight));
-sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
+sf::RectangleShape background(sf::Vector2f(windowWidth, windowHeight));
+sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Test", sf::Style::None);
 
 
-sf::Keyboard::Key MenuButton;
+sf::Keyboard::Key menuButton;
 
 //looks
-float PlayerHeight = 100.0f;
-float PlayerWidth = 100.0f;
+float playerHeight = 100.0f;
+float playerWidth = 100.0f;
 
 //PlayerStats
-float PlayerCollissionRadius = PlayerWidth / 2;
+float PlayerCollissionRadius = playerWidth / 2;
 sf::CircleShape PlayerCollission(PlayerCollissionRadius, 30.0f);
-sf::RectangleShape Player(sf::Vector2f(PlayerWidth, PlayerHeight));
+sf::RectangleShape Player(sf::Vector2f(playerWidth, playerHeight));
 sf::RectangleShape ScoreHud(sf::Vector2f(200.0f, 150.0f));
 
-sf::CircleShape enemyCollission(PlayerCollissionRadius, 30.0f);
-sf::RectangleShape enemyTest(sf::Vector2f(100.0f, 100.0f));
 
 bool playerIsAlive;
 
@@ -56,10 +54,8 @@ float speed = 0.1;
 sf::Texture gameoverTexture;
 sf::Sprite gameoverSprite;
 
-
-
 // score
-float hudPosX = WidowWidth - 200.0f;
+float hudPosX = windowWidth - 200.0f;
 float hudPosY = 0.0f;
 sf::Font font;
 sf::Text showPoints;
@@ -67,9 +63,7 @@ std::string score;
 
 int points = 0;
 
-// Physics
-float MotorForce;
-float playerVelocity;
+//physics
 float playerDisplacement;
 PhysicsObject PhysicsPlayer;
 
@@ -80,11 +74,6 @@ bool GoingRight;
 float PlayerCollissionPosX;
 float PlayerCollissionPosY;
 
-// Vector2
-//Vector2 vector2;
-Vector2* PuntA = new Vector2(2.0f, 5.0f);;
-Vector2* PuntB = new Vector2(4.0f, 3.0f);;
-
 // Enemies
 std::vector<Enemy*> lijstMetEnemies;
 std::vector<int> lijstMetEnemiesGemist;
@@ -93,47 +82,39 @@ bool inCollissionArea;
 bool Collission;
 bool behondCollissionArea;
 
+int CloseWindowTimer = 0;
 
 void setup() {
-	MenuButton = sf::Keyboard::Key::Escape;
+	menuButton = sf::Keyboard::Key::Escape;
 	PlayerCurrentPosX = PlayerBeginPosX;
-	PlayerCurrentPosY = WindowHeight - PlayerHeight;
+	PlayerCurrentPosY = windowHeight - playerHeight;
 	playerIsAlive = true;
 
 	PlayerCollission.setFillColor(sf::Color(0, 255, 255));
 
-	Background.setFillColor(sf::Color(0, 0, 0));
+	background.setFillColor(sf::Color(0, 0, 0));
 	Player.setFillColor(sf::Color(255, 255, 255));
 	ScoreHud.setFillColor(sf::Color(255, 0, 0));
 
 	ScoreHud.setPosition(hudPosX, hudPosY);
 	Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
-	enemyCollission.setPosition(0.0f, 0.0f);
-	enemyCollission.setFillColor(sf::Color(255, 0, 255));
-	//enemyTest.setPosition(PlayerBeginPosX, WindowHeight - PlayerHeight);
-	//enemyTest.setFillColor(sf::Color(255, 255, 255));
-
-
+	
 	//Score
-	if (!font.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Playkiddo.ttf"))
+	if (!font.loadFromFile("assets/Playkiddo.ttf"))
 	{
-		std::cout << "error!\n";
+		std::cout << "error scorefont!\n";
 	}
-
-	//score = std::to_string(test);
-
 	showPoints.setFont(font);
 	showPoints.setString(std::to_string(points));
 	showPoints.setCharacterSize(24);
 	showPoints.setFillColor(sf::Color::Yellow);
 	showPoints.setPosition(hudPosX + 50.0f, hudPosY + 50.0f);
 
-
 	//end screens 
-	if (!gameoverTexture.loadFromFile("C:/Users/Nathan/Documents/02_HKU/jaar 1/blok 4/kernmodule/SFMLTest/Assets/Gameover1.PNG"))
+	if (!gameoverTexture.loadFromFile("assets/Gameover1.PNG"))
 	{
-		// error...
+		std::cout << "error gameoverscreen!\n";
 	}
 	gameoverSprite.setPosition(0.0f, 15.0f);
 	gameoverSprite.setTexture(gameoverTexture);
@@ -143,44 +124,30 @@ void setup() {
 
 void EnemySetup() {
 
-	//Enemies
-	//lijstMetEnemies = new std::vector<Enemy>();
-	//lijstMetEnemiesGemist = new std::vector<int>();
-
 	// Monster Pointers toevoegen aan de de ArrayList lijstMetEnemys
-	for (int i = 0; i <= 2; i = i + 1) {
+	for (int i = 0; i <= 1; i = i + 1) {
 		lijstMetEnemies.push_back(new Enemy(i));
 
 		for (auto i = lijstMetEnemiesGemist.begin(); i != lijstMetEnemiesGemist.end(); ++i)
 			std::cout << *i << " ";
 	}
-
 }
 
 void EnemyUpdating() {
 	EnemyAddCounter = EnemyAddCounter + 1;
 
-	if (EnemyAddCounter >= 40) {
+	if (EnemyAddCounter >= 30) {
 		lijstMetEnemies.push_back(new Enemy(1));
 		EnemyAddCounter = 0;
 	}
 }
 
-void Vector2Testing() {
-	//float _distance = vector2.Distance(PuntA, PuntB);
-	//float _distance = Vector2.Distance(PuntA, PuntB);
-	//float _distance = Vector2::Distance(PuntA, PuntB);
-
-
-	//float _test = vector2.Test(3.0f, 5.0f);
-
-}
 
 void playerMovement() {
 	playerDisplacement = PhysicsPlayer.CalculatingDisplacement(1200.0f, 1);
 
-	if (PlayerCurrentPosX > WidowWidth - 100.0f) {
-		PlayerCurrentPosX = WidowWidth - 100.0f;
+	if (PlayerCurrentPosX > windowWidth - 100.0f) {
+		PlayerCurrentPosX = windowWidth - 100.0f;
 	}
 	if (PlayerCurrentPosX < 0) {
 		PlayerCurrentPosX = 0;
@@ -193,7 +160,7 @@ void playerMovement() {
 		Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && PlayerCurrentPosX < WidowWidth - 100.0f) {
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && PlayerCurrentPosX < windowWidth - 100.0f) {
 		GoingRight = true;
 		PlayerNewPosX = PlayerCurrentPosX + playerDisplacement;
 		PlayerCurrentPosX = PlayerNewPosX;
@@ -207,43 +174,38 @@ void playerMovement() {
 			Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 		}
 
-		if (GoingRight == false && PlayerCurrentPosX < WidowWidth - 100.0f) {
+		if (GoingRight == false && PlayerCurrentPosX < windowWidth - 100.0f) {
 			PlayerNewPosX = PlayerCurrentPosX - playerDisplacement;
 			PlayerCurrentPosX = PlayerNewPosX;
 			Player.setPosition(PlayerCurrentPosX, PlayerCurrentPosY);
 		}
 
 	}
-
-	//std::cout << "PlayerCurrentPosX : " << PlayerCurrentPosX << std::endl;
 }
 
 void CollissionCheck() {
 	PlayerCollissionPosX = PlayerCurrentPosX;
 	PlayerCollissionPosY = PlayerCurrentPosY;
 	PlayerCollission.setPosition(PlayerCollissionPosX, PlayerCollissionPosY);
-
-	//std::cout << "PlayerCollissionPosX : " << PlayerCollissionPosX << std::endl;
-
 }
 
 void EnemyManagment() {
-	for (int i = 0; i < lijstMetEnemies.size(); i = i + 1) {
-		//lijstMetEnemies[i];
-
+	for (auto it = lijstMetEnemies.begin(); it != lijstMetEnemies.end(); it++) {
+		//enemy;
+		auto enemy = *it;
 		// hier wordt de enemy zijn behavoir opgeroepen;
-		lijstMetEnemies[i]->MoveEnemy();
+		enemy->MoveEnemy();
 
 		//hier wordt om het lichaam van de enemy gevraagd om hem te tekenen op de window
-		window.draw(lijstMetEnemies[i]->getEnemyRect());
-		window.draw(lijstMetEnemies[i]->getEnemyCirlce());
+		window.draw(enemy->getEnemyRect());
+		window.draw(enemy->getEnemyCirlce());
 
 		//collission detection
-		inCollissionArea = lijstMetEnemies[i]->InCollissionArea(PlayerCollissionPosY);
-		behondCollissionArea = lijstMetEnemies[i]->behondCollissionArea(PlayerCollissionPosY);
+		inCollissionArea = enemy->InCollissionArea(PlayerCollissionPosY);
+		behondCollissionArea = enemy->behondCollissionArea(PlayerCollissionPosY);
 
 		if (inCollissionArea == true) {
-			Collission = lijstMetEnemies[i]->CollissionDetection(PlayerCollissionPosX, PlayerCollissionPosY);
+			Collission = enemy->CollissionDetection(PlayerCollissionPosX, PlayerCollissionPosY);
 			if (Collission == true) {
 				// game over screen
 				playerIsAlive = false;
@@ -253,35 +215,50 @@ void EnemyManagment() {
 
 		if (behondCollissionArea == true) {
 			// + 1 score en delete enemy
-			//lijstMetEnemies.erase(lijstMetEnemies[i]);
-			//delete lijstMetEnemies[i];
-			//lijstMetEnemies.erase(lijstMetEnemies.begin());
-			
+			auto tempEnemy = *it;
+			it = lijstMetEnemies.erase(std::find(lijstMetEnemies.begin(), lijstMetEnemies.end(), enemy));
+			delete tempEnemy;
 			points++;
 		}
+	}
+}
 
+void DrawElements() {
+	if (playerIsAlive == true) {
+		showPoints.setString(std::to_string(points));
+		window.draw(ScoreHud);
+		window.draw(showPoints);
+		window.draw(Player);
+		window.draw(PlayerCollission);
+	}
+	else {
+		window.draw(background);
+		window.draw(gameoverSprite);
+	}
 
-		//if (laagGenoeg) {
-		//	lijstMetEnemies[i]->IsAlive(PlayerCollissionPosX, PlayerCollissionPosY);
-		//}
+	if (playerIsAlive == false) {
+		CloseWindowTimer++;
 
+		if (CloseWindowTimer == 150) {
+			window.close();
+		}
 	}
 }
 
 int main()
 {
-
-	//sf::RenderWindow window(sf::VideoMode(WidowWidth, WindowHeight), "Test", sf::Style::None);
 	sf::Event e;
 	window.setFramerateLimit(60);
-	window.draw(Background);
+	window.draw(background);
 
 	setup();
 	EnemySetup();
-	//Vector2Testing();
 
 	while (window.isOpen())
 	{
+		if (sf::Keyboard::isKeyPressed(menuButton)) {
+			window.close();
+		}
 
 		while (window.pollEvent(e))
 		{
@@ -294,45 +271,13 @@ int main()
 		playerMovement();
 		CollissionCheck();
 		EnemyManagment();
-
-		if (sf::Keyboard::isKeyPressed(MenuButton)) {
-			window.close();
-		}
-
-
-		if (playerIsAlive == true) {
-			//test = test + 1;
-			showPoints.setString(std::to_string(points));
-			window.draw(ScoreHud);
-			window.draw(showPoints);
-			//window.draw(enemyTest);
-			window.draw(enemyCollission);
-			window.draw(Player);
-			window.draw(PlayerCollission);
-		}
-		else {
-			window.draw(Background);
-			window.draw(gameoverSprite);
-		}
+		DrawElements();
 
 		window.display();
 		window.clear();
 	}
-	//std::cout << test;
+	return 0;
 }
-
-// wat heb ik nodig?
-// calculations
-//    friction calculation
-//    netto forces calculations
-//    acceleratie
-//    tijd naar seconden overbrengen
-
-
-
-
-
-
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

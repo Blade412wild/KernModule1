@@ -20,10 +20,6 @@ Enemy::Enemy(int _enemyID)
 
 	currentPosX = beginPosX;
 	goingRight = BeginMoveDirectionDecider();
-
-
-
-	//beginPosY = +-300 + std::rand() % 200;
 }
 
 //CopyConstructor
@@ -61,7 +57,7 @@ void Enemy::MoveEnemy() {
 	currentPosX = NewPosCalulationX(currentPosX);
 	currentPosY = NewPosCalulationY(currentPosY);
 
-	std::cout << "CurrentPosY : " << currentPosY << " & CurrentPosX : " << currentPosX << std::endl;
+	//std::cout << "enemyID : " << enemyID << " CurrentPosY : " << currentPosY << " & CurrentPosX : " << currentPosX << std::endl;
 }
 
 float Enemy::NewPosCalulationY(float _currentpos) {

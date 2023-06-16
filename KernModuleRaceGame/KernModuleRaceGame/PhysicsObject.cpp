@@ -100,11 +100,6 @@ float PhysicsObject::CalculateFmotorPlayer() {
 
 	}
 
-
-	//std::cout << "NewForce : " << NewForce << std::endl;
-	//std::cout << "currentForce : " << currentForce << std::endl;
-
-
 	return NewForce;
 }
 
